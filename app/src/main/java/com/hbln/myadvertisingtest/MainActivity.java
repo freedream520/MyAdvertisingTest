@@ -3,6 +3,7 @@ package com.hbln.myadvertisingtest;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -31,8 +32,9 @@ public class MainActivity extends BaseActivity {
     private List<UserInfo> userList;
     private String usertime;
     private String xlid;
-    private RecyclerView rv_user;
-    private BaseRecyclerAdapter<UserInfo> rvUserInfoBaseRecyclerAdapter;
+    //    private RecyclerView rv_user;
+    private TextView tv_userinfo;
+    //    private BaseRecyclerAdapter<UserInfo> rvUserInfoBaseRecyclerAdapter;
     private int index = 0;
 
     @Override
@@ -44,7 +46,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         recyclerView = (RecyclerView) findViewById(R.id.rv_main);
-        rv_user = (RecyclerView) findViewById(R.id.rv_user);
+        tv_userinfo = (TextView) findViewById(R.id.tv_userinfo);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getDataUpdata() {
-        controller.getDataUpdata(new iCallbackResult() {
+        controller.getFirstDataUpdata(new iCallbackResult() {
             @Override
             public void success(String result) {
                 try {
@@ -129,14 +131,24 @@ public class MainActivity extends BaseActivity {
                     Logs.e(getClass(), "userList.size()", userList.size(), "userList.toString()", userList.toString());
                     usertime = userList.get(userList.size() - 1).getCreate_time();
                     UtilFactory.getSharedPreferencesUtil().put(ShareConstants.USER_TIME, usertime);
-                    rvUserInfoBaseRecyclerAdapter = new BaseRecyclerAdapter<UserInfo>(getContext(), userList, R.layout.item_main_list) {
-                        @Override
-                        public void convert(MyViewHolder viewHolder, UserInfo item, int position) {
-                            viewHolder.setText(R.id.tv_item_rv_user, item.getNickname() + "在" + TimeUtil.getInstance().getTime("yyyy年MM月dd日", item.getCreate_time() + "000") + "关注了天天游世界的微信公共号");
+//                    rvUserInfoBaseRecyclerAdapter = new BaseRecyclerAdapter<UserInfo>(getContext(), userList, R.layout.item_main_list) {
+//                        @Override
+//                        public void convert(MyViewHolder viewHolder, UserInfo item, int position) {
+//                            viewHolder.setText(R.id.tv_item_rv_user, item.getNickname() + "在" + TimeUtil.getInstance().getTime("yyyy年MM月dd日", item.getCreate_time() + "000") + "关注了天天游世界的微信公共号");
+//                        }
+//                    };
+//                    rv_user.setLayoutManager(new LinearLayoutManager(getContext()));
+//                    rv_user.setAdapter(rvUserInfoBaseRecyclerAdapter);
+                    StringBuilder sUserinfo = new StringBuilder("");
+                    index = 3;
+                    for (int i = 0; i < index; i++) {
+                        if (i > userList.size() - 1) {
+                            continue;
                         }
-                    };
-                    rv_user.setLayoutManager(new LinearLayoutManager(getContext()));
-                    rv_user.setAdapter(rvUserInfoBaseRecyclerAdapter);
+                        UserInfo userInfo = userList.get(i);
+                        sUserinfo.append(userInfo.getNickname()).append("在").append(TimeUtil.getInstance().getTime("yyyy年MM月dd日", userInfo.getCreate_time() + "000")).append("关注了天天游世界的微信公共号\n");
+                    }
+                    tv_userinfo.setText(sUserinfo.toString());
                     runThread.start();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -162,10 +174,30 @@ public class MainActivity extends BaseActivity {
                     });
 
                     //用户更新
-                    if (index == rvUserInfoBaseRecyclerAdapter.getItemCount() - 1) {
-                        index = -1;
+//                    if (index == rvUserInfoBaseRecyclerAdapter.getItemCount() - 1) {
+//                        index = -1;
+//                    }
+//                    rv_user.smoothScrollToPosition(++index);
+
+                    final StringBuilder sUserinfo = new StringBuilder("");
+                    index++;
+                    if (index <= userList.size()) {
+                        for (int i = index - 3; i < index; i++) {
+                            if (i > userList.size() - 1) {
+                                continue;
+                            }
+                            UserInfo userInfo = userList.get(i);
+                            sUserinfo.append(userInfo.getNickname()).append("在").append(TimeUtil.getInstance().getTime("yyyy年MM月dd日", userInfo.getCreate_time() + "000")).append("关注了天天游世界的微信公共号\n");
+                        }
+                        tv_userinfo.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv_userinfo.setText(sUserinfo.toString());
+                            }
+                        });
+                    } else {
+                        index--;
                     }
-                    rv_user.smoothScrollToPosition(++index);
                     getDataUpdata();
                 }
             } catch (InterruptedException e) {

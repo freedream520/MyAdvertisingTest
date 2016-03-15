@@ -7,9 +7,14 @@ import java.util.HashMap;
  * Created by lwc on 2015/12/26.
  */
 public interface NetController {
-    void baseRequest(String url, HashMap<String,String> params,iCallbackResult callback);
-   void travelInfo(iCallbackResult callback);
+    void baseRequest(String url, HashMap<String, String> params, iCallbackResult callback);
+
+    void travelInfo(iCallbackResult callback);
+
     void getDataUpdata(iCallbackResult callback);
+
+    void getFirstDataUpdata(iCallbackResult callback);
+
     void getUserList(iCallbackResult callback);
 
 }

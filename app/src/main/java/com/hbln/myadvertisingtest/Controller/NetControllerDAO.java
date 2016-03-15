@@ -70,6 +70,12 @@ public class NetControllerDAO implements NetController {
     }
 
     @Override
+    public void getFirstDataUpdata(iCallbackResult callback) {
+        HashMap<String, String> param = new HashMap<>();
+        baseRequest(NetConstants.URL_DATA_UPDATA, param, callback);
+    }
+
+    @Override
     public void getUserList(iCallbackResult callback) {
         baseRequest(NetConstants.URL_USER_LIST, null, callback);
     }
